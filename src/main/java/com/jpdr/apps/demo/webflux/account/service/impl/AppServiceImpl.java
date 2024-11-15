@@ -19,13 +19,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -70,10 +70,10 @@ public class AppServiceImpl implements AppService {
   }
   
   @Override
-  public Flux<AccountDto> findAccounts(Integer ownerId) {
+  public Mono<List<AccountDto>> findAccounts(Integer ownerId) {
     log.debug("findAccounts");
     return Mono.just(Optional.ofNullable(ownerId))
-      .flatMapMany(optional -> {
+      .flatMap(optional -> {
         if (optional.isPresent()) {
           return this.findAllAccountsByOwnerId(optional.get());
         }
@@ -82,22 +82,24 @@ public class AppServiceImpl implements AppService {
   }
   
   @Override
-  public Flux<AccountDto> findAllAccounts() {
+  public Mono<List<AccountDto>> findAllAccounts() {
     log.debug("findAllAccounts");
     return this.accountRepository.findAllByIsActiveIsTrue()
       .map(AccountMapper.INSTANCE::entityToDto)
-      .doOnNext(account -> log.debug(account.toString()));
+      .doOnNext(account -> log.debug(account.toString()))
+      .collectList();
   }
   
   
   @Override
-  public Flux<AccountDto> findAllAccountsByOwnerId(Integer ownerId) {
+  public Mono<List<AccountDto>> findAllAccountsByOwnerId(Integer ownerId) {
     log.debug("findAllAccountsByOwnerId");
     return this.userRepository.getUserById(ownerId)
       .flatMapMany(userDto -> this.accountRepository.findByOwnerIdAndIsActiveIsTrue(
           userDto.getId()))
       .doOnNext(account -> log.debug(account.toString()))
-      .map(AccountMapper.INSTANCE::entityToDto);
+      .map(AccountMapper.INSTANCE::entityToDto)
+      .collectList();
   }
   
 
@@ -144,9 +146,9 @@ public class AppServiceImpl implements AppService {
   
   
   @Override
-  public Flux<AccountTransactionDto> findTransactions(Integer accountId) {
+  public Mono<List<AccountTransactionDto>> findTransactions(Integer accountId) {
     return Mono.just(Optional.ofNullable(accountId))
-      .flatMapMany(optional -> {
+      .flatMap(optional -> {
         if(optional.isPresent()){
           return this.findTransactionsByAccountId(optional.get());
         }
@@ -155,7 +157,7 @@ public class AppServiceImpl implements AppService {
   }
   
   @Override
-  public Flux<AccountTransactionDto> findTransactionsByAccountId(Integer accountId) {
+  public Mono<List<AccountTransactionDto>> findTransactionsByAccountId(Integer accountId) {
     log.debug("findTransactionsByAccountId");
     return this.accountRepository.findByIdAndIsActiveIsTrue(accountId)
       .switchIfEmpty(Mono.error(new AccountNotFoundException(accountId)))
@@ -163,15 +165,17 @@ public class AppServiceImpl implements AppService {
       .flatMapMany(account -> this.accountTransactionRepository
         .findByAccountIdOrderByTransactionDateDesc(account.getId()))
       .doOnNext(transaction -> log.debug(transaction.toString()))
-      .map(AccountTransactionMapper.INSTANCE::entityToDto);
+      .map(AccountTransactionMapper.INSTANCE::entityToDto)
+      .collectList();
   }
   
   
   @Override
-  public Flux<AccountTransactionDto> findAllTransactions() {
+  public Mono<List<AccountTransactionDto>> findAllTransactions() {
     return this.accountTransactionRepository.findAll()
       .map(AccountTransactionMapper.INSTANCE::entityToDto)
-      .doOnNext(account -> log.debug(account.toString()));
+      .doOnNext(account -> log.debug(account.toString()))
+      .collectList();
   }
   
   private Account getAccountForUser(UserDto userDto){

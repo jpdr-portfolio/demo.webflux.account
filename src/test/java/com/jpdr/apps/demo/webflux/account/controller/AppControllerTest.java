@@ -77,7 +77,7 @@ class AppControllerTest {
     List<AccountDto> expectedAccounts = getAccountDtos();
     
     when(appService.findAccounts(isNull()))
-      .thenReturn(Flux.fromIterable(expectedAccounts));
+      .thenReturn(Mono.just(expectedAccounts));
     
     String expectedBody = objectMapper.writeValueAsString(expectedAccounts);
     
@@ -106,7 +106,7 @@ class AppControllerTest {
     List<AccountDto> expectedAccounts = getAccountDtos();
     
     when(appService.findAccounts(anyInt()))
-      .thenReturn(Flux.fromIterable(expectedAccounts));
+      .thenReturn(Mono.just(expectedAccounts));
     
     String expectedBody = objectMapper.writeValueAsString(expectedAccounts);
     
@@ -224,7 +224,7 @@ class AppControllerTest {
       getAccountTransactionDtos(AccountTransactionTypeEnum.CREDIT);
     
     when(appService.findAllTransactions())
-      .thenReturn(Flux.fromIterable(expectedTransactions));
+      .thenReturn(Mono.just(expectedTransactions));
     
     String expectedBody = objectMapper.writeValueAsString(expectedTransactions);
     
@@ -252,7 +252,7 @@ class AppControllerTest {
       getAccountTransactionDtos(AccountTransactionTypeEnum.CREDIT);
 
     when(appService.findTransactions(anyInt()))
-      .thenReturn(Flux.fromIterable(expectedTransactions));
+      .thenReturn(Mono.just(expectedTransactions));
 
     String expectedBody = objectMapper.writeValueAsString(expectedTransactions);
 

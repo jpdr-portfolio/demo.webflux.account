@@ -104,9 +104,11 @@ class AppServiceTest {
       .thenReturn(Flux.fromIterable(accounts));
     
     StepVerifier.create(appService.findAccounts(null))
-      .assertNext(dto -> assertAccount(accountsMap.get(dto.getId()),dto))
-      .assertNext(dto -> assertAccount(accountsMap.get(dto.getId()),dto))
-      .assertNext(dto -> assertAccount(accountsMap.get(dto.getId()),dto))
+      .assertNext(dtos -> {
+        for(AccountDto dto : dtos){
+          assertAccount(accountsMap.get(dto.getId()),dto);
+        }
+      })
       .expectComplete()
       .verify();
   }
@@ -127,9 +129,11 @@ class AppServiceTest {
       .thenReturn(Flux.fromIterable(accounts));
     
     StepVerifier.create(appService.findAccounts(1))
-      .assertNext(dto -> assertAccount(accountsMap.get(dto.getId()),dto))
-      .assertNext(dto -> assertAccount(accountsMap.get(dto.getId()),dto))
-      .assertNext(dto -> assertAccount(accountsMap.get(dto.getId()),dto))
+      .assertNext(dtos -> {
+        for(AccountDto dto : dtos){
+          assertAccount(accountsMap.get(dto.getId()),dto);
+        }
+      })
       .expectComplete()
       .verify();
   }
@@ -147,6 +151,7 @@ class AppServiceTest {
       .thenReturn(Flux.empty());
     
     StepVerifier.create(appService.findAllAccountsByOwnerId(1))
+      .assertNext(accounts -> accounts.isEmpty())
       .expectComplete()
       .verify();
     
@@ -322,12 +327,12 @@ class AppServiceTest {
       .thenReturn(Flux.fromIterable(accountTransactions));
     
     StepVerifier.create(appService.findAllTransactions())
-      .assertNext(dto -> assertEquals(accountTransactionsMap.get(dto.getId()).getTransactionAmount(),
-        dto.getTransactionAmount()))
-      .assertNext(dto -> assertEquals(accountTransactionsMap.get(dto.getId()).getTransactionAmount(),
-        dto.getTransactionAmount()))
-      .assertNext(dto -> assertEquals(accountTransactionsMap.get(dto.getId()).getTransactionAmount(),
-        dto.getTransactionAmount()))
+      .assertNext(dtos -> {
+        for(AccountTransactionDto dto : dtos){
+          assertEquals(accountTransactionsMap.get(dto.getId()).getTransactionAmount(),
+            dto.getTransactionAmount());
+        }
+      })
       .expectComplete()
       .verify();
     
@@ -351,12 +356,12 @@ class AppServiceTest {
       .thenReturn(Flux.fromIterable(accountTransactions));
 
     StepVerifier.create(appService.findTransactionsByAccountId(1))
-      .assertNext(dto -> assertEquals(accountTransactionsMap.get(dto.getId()).getTransactionAmount(),
-        dto.getTransactionAmount()))
-      .assertNext(dto -> assertEquals(accountTransactionsMap.get(dto.getId()).getTransactionAmount(),
-        dto.getTransactionAmount()))
-      .assertNext(dto -> assertEquals(accountTransactionsMap.get(dto.getId()).getTransactionAmount(),
-        dto.getTransactionAmount()))
+      .assertNext(dtos -> {
+        for(AccountTransactionDto dto : dtos){
+          assertEquals(accountTransactionsMap.get(dto.getId()).getTransactionAmount(),
+            dto.getTransactionAmount());
+        }
+      })
       .expectComplete()
       .verify();
 
@@ -387,6 +392,7 @@ class AppServiceTest {
       .thenReturn(Flux.empty());
 
     StepVerifier.create(appService.findTransactions(1))
+      .assertNext(transactions -> transactions.isEmpty())
       .expectComplete()
       .verify();
 

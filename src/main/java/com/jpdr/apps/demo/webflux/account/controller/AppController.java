@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -24,37 +25,43 @@ public class AppController {
   private final AppService appService;
   
   @GetMapping("/accounts/{id}")
-  public ResponseEntity<Mono<AccountDto>> findAccountById(@PathVariable(value = "id") Integer id){
-    return new ResponseEntity<>(appService.findAccountById(id), HttpStatus.OK);
+  public Mono<ResponseEntity<AccountDto>> findAccountById(@PathVariable(value = "id") Integer id){
+    return this.appService.findAccountById(id)
+      .map(account-> new ResponseEntity<>(account, HttpStatus.OK));
   }
   
   @GetMapping("/accounts")
-  public ResponseEntity<Flux<AccountDto>> findAllAccounts(@RequestParam(value = "ownerId", required = false) Integer ownerId){
-    return new ResponseEntity<>(appService.findAccounts(ownerId), HttpStatus.OK);
+  public Mono<ResponseEntity<List<AccountDto>>> findAllAccounts(@RequestParam(value = "ownerId",
+    required = false) Integer ownerId){
+    return this.appService.findAccounts(ownerId)
+      .map(accounts -> new ResponseEntity<>(accounts, HttpStatus.OK));
   }
   
   @PostMapping("/accounts")
-  public ResponseEntity<Mono<AccountDto>> createAccount(@RequestBody AccountDto accountDto){
-    return new ResponseEntity<>(appService.createAccount(accountDto), HttpStatus.CREATED);
+  public Mono<ResponseEntity<AccountDto>> createAccount(@RequestBody AccountDto accountDto){
+    return this.appService.createAccount(accountDto)
+      .map(account -> new ResponseEntity<>(account, HttpStatus.CREATED));
   }
   
   @GetMapping("/accounts/transactions")
-  public ResponseEntity<Flux<AccountTransactionDto>> findAllTransactions(){
-    return new ResponseEntity<>(appService.findAllTransactions(), HttpStatus.OK);
+  public Mono<ResponseEntity<List<AccountTransactionDto>>> findAllTransactions(){
+    return this.appService.findAllTransactions()
+      .map(transaction -> new ResponseEntity<>(transaction, HttpStatus.OK));
   }
   
   @GetMapping("/accounts/{id}/transactions")
-  public ResponseEntity<Flux<AccountTransactionDto>> findTransactions(
+  public Mono<ResponseEntity<List<AccountTransactionDto>>> findTransactions(
     @PathVariable(value = "id", required = false) Integer accountId){
-    return new ResponseEntity<>(appService.findTransactions(accountId), HttpStatus.OK);
+    return this.appService.findTransactions(accountId)
+      .map(transactions -> new ResponseEntity<>(transactions, HttpStatus.OK));
   }
   
   @PostMapping("/accounts/{id}/transactions")
-  public ResponseEntity<Mono<AccountTransactionDto>> createTransaction(
+  public  Mono<ResponseEntity<AccountTransactionDto>> createTransaction(
     @PathVariable(value = "id") Integer accountId,
     @RequestBody AccountTransactionDto accountTransactionDto){
-    return new ResponseEntity<>(appService.createTransaction(accountId,accountTransactionDto),
-      HttpStatus.CREATED);
+    return this.appService.createTransaction(accountId,accountTransactionDto)
+      .map(transaction -> new ResponseEntity<>(transaction, HttpStatus.CREATED));
   }
   
 }
