@@ -3,6 +3,7 @@ package com.jpdr.apps.demo.webflux.account.controller;
 import com.jpdr.apps.demo.webflux.account.service.AppService;
 import com.jpdr.apps.demo.webflux.account.service.dto.account.AccountDto;
 import com.jpdr.apps.demo.webflux.account.service.dto.account.AccountTransactionDto;
+import com.jpdr.apps.demo.webflux.eventlogger.component.EventLogger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,10 +24,12 @@ import java.util.List;
 public class AppController {
   
   private final AppService appService;
+  private final EventLogger eventLogger;
   
   @GetMapping("/accounts/{id}")
   public Mono<ResponseEntity<AccountDto>> findAccountById(@PathVariable(value = "id") Integer id){
     return this.appService.findAccountById(id)
+      .doOnNext(account -> this.eventLogger.logEvent("findAccountById", account))
       .map(account-> new ResponseEntity<>(account, HttpStatus.OK));
   }
   
@@ -34,25 +37,29 @@ public class AppController {
   public Mono<ResponseEntity<List<AccountDto>>> findAllAccounts(@RequestParam(value = "ownerId",
     required = false) Integer ownerId){
     return this.appService.findAccounts(ownerId)
+      .doOnNext(accounts -> this.eventLogger.logEvent("findAllAccounts", accounts))
       .map(accounts -> new ResponseEntity<>(accounts, HttpStatus.OK));
   }
   
   @PostMapping("/accounts")
   public Mono<ResponseEntity<AccountDto>> createAccount(@RequestBody AccountDto accountDto){
     return this.appService.createAccount(accountDto)
+      .doOnNext(account -> this.eventLogger.logEvent("createAccount", account))
       .map(account -> new ResponseEntity<>(account, HttpStatus.CREATED));
   }
   
   @GetMapping("/accounts/transactions")
   public Mono<ResponseEntity<List<AccountTransactionDto>>> findAllTransactions(){
     return this.appService.findAllTransactions()
-      .map(transaction -> new ResponseEntity<>(transaction, HttpStatus.OK));
+      .doOnNext(transactions -> this.eventLogger.logEvent("findAllTransactions", transactions))
+      .map(transactions -> new ResponseEntity<>(transactions, HttpStatus.OK));
   }
   
   @GetMapping("/accounts/{id}/transactions")
   public Mono<ResponseEntity<List<AccountTransactionDto>>> findTransactions(
     @PathVariable(value = "id", required = false) Integer accountId){
     return this.appService.findTransactions(accountId)
+      .doOnNext(transactions -> this.eventLogger.logEvent("findTransactions", transactions))
       .map(transactions -> new ResponseEntity<>(transactions, HttpStatus.OK));
   }
   
@@ -61,6 +68,7 @@ public class AppController {
     @PathVariable(value = "id") Integer accountId,
     @RequestBody AccountTransactionDto accountTransactionDto){
     return this.appService.createTransaction(accountId,accountTransactionDto)
+      .doOnNext(transaction -> this.eventLogger.logEvent("createTransaction", transaction))
       .map(transaction -> new ResponseEntity<>(transaction, HttpStatus.CREATED));
   }
   

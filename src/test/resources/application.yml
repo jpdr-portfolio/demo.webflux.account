@@ -12,9 +12,31 @@ spring:
     url: r2dbc:h2:mem:///account;
     username: sa
     password:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 1234
+      connect-timeout: 2000
+  cache:
+    type: REDIS
+    cache-names:
+      - accounts
+      - users
 logging:
   level:
     com.jpdr.apps.demo.webflux: DEBUG
+    org.springframework.r2dbc: DEBUG
 app:
+  pod-name: "demo.webflux.account-0"
   base-url:
     user: "http://localhost:8081"
+  event-logger:
+    kafka:
+      topic: "topic"
+      boostrap-server: "http://localhost:9092"
+      compression-type: "none"
+      delivery-timeout-ms: 10000
+      request-timeout-ms: 10000
+      add-type-info-headers: false
+      retries: 10

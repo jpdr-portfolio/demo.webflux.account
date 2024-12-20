@@ -6,6 +6,7 @@ import com.jpdr.apps.demo.webflux.account.repository.user.UserRepository;
 import com.jpdr.apps.demo.webflux.account.service.dto.user.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -25,6 +26,7 @@ public class UserRepositoryImpl implements UserRepository {
   }
   
   @Override
+  @Cacheable(key = "#userId", value = "users", sync = true)
   public Mono<UserDto> getUserById(Integer userId) {
     return this.webClient.get()
       .uri("/users/{userId}", userId)

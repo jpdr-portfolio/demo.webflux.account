@@ -5,6 +5,7 @@ import com.jpdr.apps.demo.webflux.account.service.AppService;
 import com.jpdr.apps.demo.webflux.account.service.dto.account.AccountDto;
 import com.jpdr.apps.demo.webflux.account.service.dto.account.AccountTransactionDto;
 import com.jpdr.apps.demo.webflux.account.service.enums.AccountTransactionTypeEnum;
+import com.jpdr.apps.demo.webflux.eventlogger.component.EventLogger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +17,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(MockitoExtension.class)
 class AppControllerTest {
   
@@ -45,6 +45,8 @@ class AppControllerTest {
   private AppService appService;
   @Autowired
   private ObjectMapper objectMapper;
+  @MockBean
+  private EventLogger eventLogger;
   
   @Test
   @DisplayName("OK - Find Account By Id")

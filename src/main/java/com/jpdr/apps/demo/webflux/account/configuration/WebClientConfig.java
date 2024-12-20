@@ -32,10 +32,10 @@ public class WebClientConfig {
       .clientConnector(
         new ReactorClientHttpConnector(HttpClient.create(connectionProvider)
           .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-          .responseTimeout(Duration.ofMillis(5000))
+          .responseTimeout(Duration.ofMillis(10000))
           .doOnConnected( connection ->  connection
-            .addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS))
-            .addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS)))
+            .addHandlerLast(new ReadTimeoutHandler(10000, TimeUnit.MILLISECONDS))
+            .addHandlerLast(new WriteTimeoutHandler(10000, TimeUnit.MILLISECONDS)))
           .secure(spec -> spec.sslContext(sslContextSpec)
             .handshakeTimeout(Duration.ofMillis(5000))
             .closeNotifyFlushTimeout(Duration.ofMillis(5000))

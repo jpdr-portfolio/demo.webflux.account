@@ -17,6 +17,7 @@ import com.jpdr.apps.demo.webflux.account.service.mapper.AccountTransactionMappe
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -61,6 +62,7 @@ public class AppServiceImpl implements AppService {
   
   
   @Override
+  @Cacheable(key = "#accountId", value = "accounts", sync = true)
   public Mono<AccountDto> findAccountById(Integer accountId) {
     log.debug("findById");
     return this.accountRepository.findByIdAndIsActiveIsTrue(accountId)
