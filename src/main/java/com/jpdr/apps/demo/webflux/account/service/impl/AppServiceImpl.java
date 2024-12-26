@@ -17,6 +17,7 @@ import com.jpdr.apps.demo.webflux.account.service.mapper.AccountTransactionMappe
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,7 @@ public class AppServiceImpl implements AppService {
   
   
   @Override
+  @Cacheable(key = "#accountId", value = "accounts", sync = true)
   @Transactional
   public Mono<AccountDto> createAccount(AccountDto accountDto) {
     log.debug("createAccount");
@@ -109,6 +111,7 @@ public class AppServiceImpl implements AppService {
 
   
   @Override
+  @CacheEvict(key = "#accountId", value = "accounts")
   @Transactional
   public Mono<AccountTransactionDto> createTransaction(Integer accountId, AccountTransactionDto accountTransactionDto) {
     log.debug("createTransaction");
