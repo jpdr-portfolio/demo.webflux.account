@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jpdr.apps.demo.webflux.account.service.dto.account.AccountDto;
 import com.jpdr.apps.demo.webflux.account.service.dto.user.UserDto;
-import com.jpdr.apps.demo.webflux.account.util.DtoSerializer;
+import com.jpdr.apps.demo.webflux.commons.caching.DtoSerializer;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;

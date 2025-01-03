@@ -52,6 +52,7 @@ dependencies {
 	testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.12.0'
 	testImplementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
 	implementation 'com.jpdr.apps:demo.webflux.eventlogger:1.0.19'
+	implementation 'com.jpdr.apps:demo.webflux.commons:0.0.3'
 
 
 }

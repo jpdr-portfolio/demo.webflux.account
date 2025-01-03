@@ -14,6 +14,7 @@ import com.jpdr.apps.demo.webflux.account.service.dto.user.UserDto;
 import com.jpdr.apps.demo.webflux.account.service.enums.AccountTransactionTypeEnum;
 import com.jpdr.apps.demo.webflux.account.service.mapper.AccountMapper;
 import com.jpdr.apps.demo.webflux.account.service.mapper.AccountTransactionMapper;
+import com.jpdr.apps.demo.webflux.commons.caching.CacheHelper;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.jpdr.apps.demo.webflux.account.util.InputValidator.isValidAmount;
+import static com.jpdr.apps.demo.webflux.commons.validation.InputValidator.isValidAmount;
 
 @Slf4j
 @Service
@@ -41,10 +42,10 @@ public class AppServiceImpl implements AppService {
   private final AccountRepository accountRepository;
   private final AccountTransactionRepository accountTransactionRepository;
   private final UserRepository userRepository;
+  private final CacheHelper cacheHelper;
   
   
   @Override
-  @Cacheable(key = "#accountId", value = "accounts", sync = true)
   @Transactional
   public Mono<AccountDto> createAccount(AccountDto accountDto) {
     log.debug("createAccount");
@@ -59,7 +60,9 @@ public class AppServiceImpl implements AppService {
       })
       .flatMap(this.accountRepository::save)
       .doOnNext(savedAccount -> log.debug(savedAccount.toString()))
-      .map(AccountMapper.INSTANCE::entityToDto);
+      .map(AccountMapper.INSTANCE::entityToDto)
+      .doOnNext(savedAccount -> this.cacheHelper.put("accounts",
+        savedAccount.getId(), savedAccount));
   }
   
   

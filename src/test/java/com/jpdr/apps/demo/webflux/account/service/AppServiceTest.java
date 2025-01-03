@@ -13,6 +13,7 @@ import com.jpdr.apps.demo.webflux.account.service.dto.account.AccountTransaction
 import com.jpdr.apps.demo.webflux.account.service.dto.user.UserDto;
 import com.jpdr.apps.demo.webflux.account.service.enums.AccountTransactionTypeEnum;
 import com.jpdr.apps.demo.webflux.account.service.impl.AppServiceImpl;
+import com.jpdr.apps.demo.webflux.commons.caching.CacheHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -52,15 +54,14 @@ class AppServiceTest {
   
   @InjectMocks
   private AppServiceImpl appService;
-  
   @Mock
   private AccountRepository accountRepository;
-  
   @Mock
   private AccountTransactionRepository accountTransactionRepository;
-  
   @Mock
   private UserRepository userRepository;
+  @Mock
+  private CacheHelper cacheHelper;
 
   
   @Test
@@ -151,7 +152,7 @@ class AppServiceTest {
       .thenReturn(Flux.empty());
     
     StepVerifier.create(appService.findAllAccountsByOwnerId(1))
-      .assertNext(accounts -> accounts.isEmpty())
+      .assertNext(Collection::isEmpty)
       .expectComplete()
       .verify();
     
@@ -392,7 +393,7 @@ class AppServiceTest {
       .thenReturn(Flux.empty());
 
     StepVerifier.create(appService.findTransactions(1))
-      .assertNext(transactions -> transactions.isEmpty())
+      .assertNext(Collection::isEmpty)
       .expectComplete()
       .verify();
 
